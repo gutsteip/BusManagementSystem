@@ -8,7 +8,9 @@ public class BusStop
 		String[] parts = input.trim().split(",");
 		
 		stopID = Integer.valueOf(parts[0]);
-		stopCode = Integer.valueOf(parts[1]);
+		
+		if(!parts[1].equals(" "))
+			stopCode = Integer.valueOf(parts[1]);
 		
 		stopName = parts[2];
 		
