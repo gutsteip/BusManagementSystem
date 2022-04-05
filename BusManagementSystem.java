@@ -24,6 +24,9 @@ public class BusManagementSystem
 		for(int i = 0; i < numStops; i++)
 			stopNames.put(stops[i].getStopName(), stops[i].getStopName());
 		
+		//Add edges from transfers to stops
+		addTransferEdges(stops);
+		
 		mainUserLoop(numStops, stops, stopNames);
 	}
 	
@@ -53,42 +56,7 @@ public class BusManagementSystem
 				System.out.println("\nPATH BETWEEN TWO STOPS\n");
 			}
 			else if(userInputString.equals("2"))
-			{
 				searchBusStop(userInput, stops, stopNames);
-				/*
-				String stopPrefix = "";
-				Boolean printedResult = false;
-				
-				while(stopPrefix.equals(""))
-				{
-					System.out.print("Please search for the stop you'd like information on.\n>");
-					if(userInput.hasNext())
-						stopPrefix = userInput.next();
-					
-					if(stopPrefix.equals(""))
-						System.out.println("\nINVALID INPUT: Please try again.");
-				}
-				
-				//Search through stopNames to get the ones that work
-				Iterable<String> allSearchStops = stopNames.keysWithPrefix(stopPrefix.toUpperCase());
-				
-				//Print out results of search
-				for(String stopName : allSearchStops)
-				{
-					int stopIndex = getStopIndex(stopName, stops);
-					if(stopIndex != -1)
-					{
-						System.out.println(stops[stopIndex]);
-						printedResult = true;
-					}
-				}
-				
-				//Print out a line for spacing reasons
-				System.out.println();
-				//If search returned nothing
-				if(!printedResult)
-					System.out.println("No stops matched your search.\n");*/
-			}
 			else if(userInputString.equals("3"))
 			{
 				System.out.println("\nSPECIFIC TRIP\n");
@@ -192,12 +160,42 @@ public class BusManagementSystem
 		}
 		return -1;
 	}
-	/*
-	public static void readTransfers()
+	
+	//Add edges to stops via transfers.txt
+	public static void addTransferEdges(BusStop[] stops)
 	{
 		try 
 		{
 			BufferedReader read = new BufferedReader(new FileReader("transfers.txt"));
+			
+			//Prepare for loop below
+			String inputString;
+			read.readLine();
+			
+			//Go until file is empty
+			while((inputString = read.readLine()) != null)
+			{
+				String[] parts = inputString.trim().split(",");
+				
+				//Split parts of input line up and assign their values
+				int startStopID = Integer.valueOf(parts[0]);
+				int endStopID = Integer.valueOf(parts[1]);
+				int transferType = Integer.valueOf(parts[2]);
+				
+				//Get stops from their IDs
+				BusStop startStop = stops[getStopIndex(startStopID, stops)];
+				BusStop endStop = stops[getStopIndex(endStopID, stops)];
+				
+				//Assign proper weight to edge
+				if(transferType == 0)
+					startStop.addEdge(new Edge(startStop, endStop, 2));
+				else
+				{
+					double transferTime = Integer.valueOf(parts[3]);
+					startStop.addEdge(new Edge(startStop, endStop, transferTime));
+				}
+			}
+			
 			read.close();
 		}
 		catch(Exception e)
@@ -205,7 +203,7 @@ public class BusManagementSystem
 			e.printStackTrace();
 		}
 	}
-	*/
+
 	/*
 	public static void readStopTimes()
 	{
