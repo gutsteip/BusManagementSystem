@@ -1,7 +1,8 @@
 public class BusStop 
 {
-	private String stopName;
-	private int stopID, stopCode;
+	private String stopName, stopDesc, stopLongitude, stopLatitude, stopZoneID;
+	private int stopID;
+	private Integer stopCode;
 	
 	public BusStop(String input)
 	{
@@ -17,11 +18,23 @@ public class BusStop
 		if(stopName.contains("NB") || stopName.contains("SB") || stopName.contains("EB") || stopName.contains("WB"))
 			stopName = stopName.substring(3) + " " + stopName.substring(0, 2);
 		
+		stopDesc = parts[3];
+		stopLatitude = parts[4];
+		stopLongitude = parts[5];
+		stopZoneID = parts[6];
 	}
 	
 	public String getStopName()
 	{
 		return stopName;
+	}
+	public String getStopLatitude()
+	{
+		return stopLatitude;
+	}
+	public String getStopLongitude()
+	{
+		return stopLongitude;
 	}
 	public int getStopID()
 	{
@@ -31,5 +44,16 @@ public class BusStop
 	{
 		return stopCode;
 	}
-
+	
+	public String toString()
+	{
+		String s = stopID + ", ";
+		
+		if(stopCode != null)
+			s += stopCode + ", ";
+		
+		s += stopName +", " + stopDesc +", " + stopLongitude + ", " + stopLatitude + ", " + stopZoneID;
+		
+		return s;
+	}
 }
