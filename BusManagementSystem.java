@@ -9,29 +9,38 @@ public class BusManagementSystem
 
 	public static void main(String[] args) 
 	{
-		//Get the total number of stops in the system
+		//Get the total number of stops and trips in the system
 		int numStops = 0;
+		int numTrips = 0;
 		try 
 			{numStops = (int)(Files.lines(Paths.get("stops.txt")).count()-1);}
 		catch(Exception e)
 			{e.printStackTrace();}
 		
+		try 
+			{numTrips = (int)(Files.lines(Paths.get("stop_times.txt")).count()-1);}
+		catch(Exception e)
+			{e.printStackTrace();}
+		
 		//Load all stops into BusStop Array
 		BusStop[] stops = getStops(numStops);
-				
+		
+		//Load all trips into Trip Array
+		Trip[] trips = getTrips(numTrips);
+						
+		//Add edges from transfers to stops for part 1
+		//addTransferEdges(stops);
+		
 		//Construct a TST for stop names for part 2
 		TernarySearchTree<String> stopNames = new TernarySearchTree<String>();
 		for(int i = 0; i < numStops; i++)
 			stopNames.put(stops[i].getStopName(), stops[i].getStopName());
-		
-		//Add edges from transfers to stops
-		addTransferEdges(stops);
-		
-		mainUserLoop(numStops, stops, stopNames);
+				
+		mainUserLoop(numStops, stops, stopNames, trips);
 	}
 	
 	//Main input loop for the program
-	public static void mainUserLoop(int numStops, BusStop[] stops, TernarySearchTree<String> stopNames)
+	public static void mainUserLoop(int numStops, BusStop[] stops, TernarySearchTree<String> stopNames, Trip[] trips)
 	{
 		//Boolean to exit main loop
 		Boolean stillUsingSystem = true;
@@ -56,10 +65,12 @@ public class BusManagementSystem
 				System.out.println("\nPATH BETWEEN TWO STOPS\n");
 			}
 			else if(userInputString.equals("2"))
+			{
 				searchBusStop(userInput, stops, stopNames);
+			}
 			else if(userInputString.equals("3"))
 			{
-				System.out.println("\nSPECIFIC TRIP\n");
+				searchTrip(userInput, trips);
 			}
 			else if(userInputString.equals("4"))
 			{
@@ -103,6 +114,8 @@ public class BusManagementSystem
 			//If the index isn't null, print it out and say you printed it out
 			if(stopIndex != -1)
 			{
+				if(!printedResult)
+					System.out.println("\nstop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,location_type");
 				System.out.println(stops[stopIndex]);
 				printedResult = true;
 			}
@@ -113,6 +126,46 @@ public class BusManagementSystem
 		//If search returned nothing
 		if(!printedResult)
 			System.out.println("No stops matched your search.\n");
+	}
+	
+	//Search for trip with specific arrival time
+	public static void searchTrip(Scanner userInput, Trip[] trips)
+	{
+		String timeInput = "";
+		Boolean printedResult = false;
+		
+		while(timeInput.equals(""))
+		{
+			System.out.print("Please search for the arrival time you'd like information on.\n>");
+			
+			//Get entire line of input instead of first word
+			if(userInput.hasNext())
+			{
+				timeInput = userInput.next();
+				timeInput += userInput.nextLine();
+			}
+			
+			if(timeInput.equals(""))
+				System.out.println("\nINVALID INPUT: Please try again.");
+		}
+		
+		//Go through trips array and print out trips that match arrival time
+		for(Trip t : trips)
+		{
+			if(t.getArrivalTime().equals(timeInput))
+			{
+				if(!printedResult)
+					System.out.println("\ntrip_id,arrival_time,departure_time,stop_id,stop_sequence");
+				System.out.println(t);
+				printedResult = true;
+			}
+		}
+		
+		//Print out a line for spacing reasons
+		System.out.println();
+		//If search returned nothing
+		if(!printedResult)
+			System.out.println("No arrival times matched your search.\n");
 	}
 	
 	//Generate array of bus stops
@@ -137,6 +190,42 @@ public class BusManagementSystem
 		
 		//Return completed BusStop array
 		return stops;
+	}
+	
+	//Generate array of trips
+	public static Trip[] getTrips(int numTrips)
+	{
+		//Initialize BusStop array
+		Trip[] trips = new Trip[numTrips];
+		try 
+		{
+			//Open file reader and clear first line (i.e. header)
+			BufferedReader read = new BufferedReader(new FileReader("stop_times.txt"));
+			read.readLine();
+			
+			//Create new BusStop objects from file reader input
+			for(int i = 0; i < numTrips; i++)
+				trips[i] = new Trip(read.readLine());
+		
+			read.close();
+		}
+		catch(Exception e)
+			{e.printStackTrace();}
+		
+		//Return completed BusStop array
+		return trips;
+	}
+	
+	//Makes sure arrival time is valid for a trip
+	public static boolean isValidArrTime(Trip trip)
+	{
+		if(trip.getArrHour() > 23 || trip.getArrHour() < 0)
+			return false;
+		if(trip.getArrMin() > 59 || trip.getArrMin() < 0)
+			return false;
+		if(trip.getArrSec() > 59 || trip.getArrSec() < 0)
+			return false;
+		return true;
 	}
 	
 	//Get index of a specific stop in the stops array via it's stopID
