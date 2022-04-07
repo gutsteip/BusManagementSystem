@@ -1,8 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.nio.file.*;
-import java.util.Arrays;
-import java.util.Scanner;
+import java.util.*;
 
 public class BusManagementSystem 
 {
@@ -133,6 +132,7 @@ public class BusManagementSystem
 	{
 		String timeInput = "";
 		Boolean printedResult = false;
+		ArrayList<Trip> validTrips = new ArrayList<Trip>();
 		
 		while(timeInput.equals(""))
 		{
@@ -149,16 +149,29 @@ public class BusManagementSystem
 				System.out.println("\nINVALID INPUT: Please try again.");
 		}
 		
-		//Go through trips array and print out trips that match arrival time
+		//Go through trips array and construct arrayList out of trips that match arrival time
 		for(Trip t : trips)
 		{
 			if(t.getArrivalTime().equals(timeInput))
+				validTrips.add(t);
+		}
+		
+		//Print out arrayList in order by trip ID
+		while(!validTrips.isEmpty())
+		{
+			int indexOfSmallestID = 0;
+			
+			//Go through array and find smallest 
+			for(int i = 0; i < validTrips.size(); i++)
 			{
-				if(!printedResult)
-					System.out.println("\ntrip_id,arrival_time,departure_time,stop_id,stop_sequence");
-				System.out.println(t);
-				printedResult = true;
+				if(validTrips.get(indexOfSmallestID).getTripID() > validTrips.get(i).getTripID())
+					indexOfSmallestID = i;
 			}
+			
+			//Print out smallest tripID and then remove it from the arraylist
+			System.out.println(validTrips.get(indexOfSmallestID));
+			validTrips.remove(indexOfSmallestID);
+			printedResult = true;
 		}
 		
 		//Print out a line for spacing reasons
