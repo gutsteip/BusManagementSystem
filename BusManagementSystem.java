@@ -114,7 +114,7 @@ public class BusManagementSystem
 			if(stopIndex != -1)
 			{
 				if(!printedResult)
-					System.out.println("\nstop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,location_type");
+					System.out.println("\nstop_id, stop_code, stop_name, stop_desc, stop_lat, stop_lon, zone_id, location_type");
 				System.out.println(stops[stopIndex]);
 				printedResult = true;
 			}
@@ -167,6 +167,10 @@ public class BusManagementSystem
 				if(validTrips.get(indexOfSmallestID).getTripID() > validTrips.get(i).getTripID())
 					indexOfSmallestID = i;
 			}
+			
+			//If first time through arraylist
+			if(!printedResult)
+				System.out.println("\ntripID, arrivalTime, departureTime, stopID, stopSequence");
 			
 			//Print out smallest tripID and then remove it from the arraylist
 			System.out.println(validTrips.get(indexOfSmallestID));
